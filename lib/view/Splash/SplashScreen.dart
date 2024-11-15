@@ -1,4 +1,3 @@
-import 'package:firebase_authntication/Controller/NotesController.dart';
 import 'package:firebase_authntication/Controller/UserController.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -20,7 +19,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   getalldata() async {
-    // await Get.find<NotesController>().getNotes();
+    await Get.find<UserController>().getAllUsers();
     // print("${NotesController().getnotes.length}---------------");
   }
 

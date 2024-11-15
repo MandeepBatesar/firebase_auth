@@ -8,100 +8,114 @@ import 'package:firebase_authntication/Model/UserModel.dart';
 import 'package:firebase_authntication/main.dart';
 import 'package:firebase_authntication/res/Api/Apis.dart';
 import 'package:firebase_authntication/view/Auth/LoginScreen.dart';
-import 'package:firebase_authntication/view/Page/ChatView.dart';
+import 'package:firebase_authntication/view/BottomBar/BottomNavigationBar.dart';
 import 'package:get/get.dart';
 
 class UserController extends GetxController {
   final _services = NetworkApiService();
   dynamic _userdata;
-  Usermodel get userdata => _userdata;
+  Usermodel get getuserdata => _userdata;
+
+  // List to store all users
+  List<Usermodel> _userList = [];
+  List<Usermodel> get getuserList => _userList;
 
   /// **************************
-  setuserdata(Usermodel model) {
+  setUserData(Usermodel model) {
     _userdata = model;
     update();
   }
 
-  /**************************** */
-  /* ********************* for userupdate in realtime show */
+  /// Fetch all users from Firestore and update _userList
+  Future<void> getAllUsers() async {
+    try {
+      final snapshot = await Apis().getusercolllection.get();
+      _userList = snapshot.docs.map((doc) {
+        return Usermodel.fromjson(doc.data());
+      }).toList();
+      update();
+    } catch (e) {
+      print("Error fetching users: $e");
+    }
+  }
+
+  /// ***************************** Real-time update of user profile
   final String _userProfile = "";
   String get userProfile => _userProfile;
+
   updateUserProfile(Usermodel model) {
     _userdata = model;
     update();
   }
 
-  /// ***************************** sign up
+  /// ***************************** Sign up
   Future<void> signup(Map<String, dynamic> data) async {
     final Usermodel userdata = Usermodel.fromjson(data["userdata"]);
-    print("--------------------1");
     try {
       final credential = await _services.auth(AuthState.SIGNUP,
               json: {"email": userdata.email, "password": data["password"]})
           as UserCredential;
-      print("--------------------2");
+
       final String userid = credential.user!.uid;
       if (userid.isNotEmpty) {
         await _services.post(
             Apis().userdoc(userid), userdata.copyWith(id: userid).tomap());
         _userdata = userdata.copyWith(id: userid);
-        prefrance.setUserPrefs(userdata);
-        Get.offAll(const ChatView());
+        prefrance.setUserPrefs(userdata); 
+        Get.offAll(BottomnavigationbarScreen());
       }
     } catch (e) {
-      // DataResponse.error(e.toString());
       print(e);
     } finally {
       update();
     }
   }
 
-  /// ************************ login
+  /// ************************ Login
   Future<void> login(String email, String password) async {
     try {
       final snapshot = await _services.getdata(
               Apis().getusercolllection.where("email", isEqualTo: email))
           as QuerySnapshot<Map<String, dynamic>>;
+
       if (snapshot.docs.isNotEmpty) {
         await _services.auth(AuthState.LOGIN,
             json: {"email": email, "password": password}) as UserCredential;
-        final Usermodel usermodeldata =
+
+        final Usermodel usermodelData =
             Usermodel.fromjson(snapshot.docs.first.data());
-        _userdata = usermodeldata;
-        prefrance.setUserPrefs(usermodeldata);
-        Get.offAll(const ChatView());
+        _userdata = usermodelData;
+        prefrance.setUserPrefs(usermodelData);
+        Get.offAll(BottomnavigationbarScreen());
       }
     } catch (e) {
-      // _userdata = DataResponse.error(e.toString());
-      print("-------login error::: $e-------");
+      print("Login error: $e");
     }
   }
 
-  /// ************************ logout
+  /// ************************ Logout
   Future<void> logout() async {
     try {
       await _services.auth(AuthState.LOGOUT);
       prefrance.removePrefs(prefrance.userkey);
       Get.offAll(const LoginScreen());
+      print("Logged out successfully");
     } catch (e) {
-      print("=====================");
-      print(e.toString());
-      print("=====================");
+      print("Logout error: $e");
     }
   }
 
-  /// ************************ relogin
+  /// ************************ Relogin
   Future<void> relogin() async {
-    print("****************************");
     try {
       final String userId = prefrance.getstring(prefrance.userkey);
       if (userId.isNotEmpty) {
         final data = await Apis().userdoc(jsonDecode(userId)["id"]).get();
         if (data.exists) {
-          final Usermodel usermodeldata = Usermodel.fromjson(data.data()!);
-          _userdata = usermodeldata;
-          prefrance.setUserPrefs(usermodeldata);
-          Get.offAll(const ChatView());
+          final Usermodel usermodelData = Usermodel.fromjson(data.data()!);
+          _userdata = usermodelData;
+          prefrance.setUserPrefs(usermodelData);
+          Get.offAll(BottomnavigationbarScreen());
         } else {
           Get.offAll(const LoginScreen());
         }
@@ -109,29 +123,21 @@ class UserController extends GetxController {
         Get.offAll(const LoginScreen());
       }
     } catch (e) {
-      print("---------relogin error:: $e-------");
+      print("Relogin error: $e");
       Get.offAll(const LoginScreen());
     } finally {
       update();
     }
   }
 
-  /// ***********************************update**************************************************
-
-  user_update(Usermodel model) {
+  /// ************************ Update user
+  Future<void> updateUser(Usermodel model) async {
     try {
-      // print("user upload Function run ************");
-      // print("step:-1.======================");
-      Apis().userdoc(userdata.id).update(model.tomap()).then(
-        (value) {
-          /************************ for userupdate in realtime show  */
-          // print("step:-2.======================");
-          updateUserProfile(model);
-        },
-      );
-      // print("step:-3.======================");
+      await Apis().userdoc(getuserdata.id).update(model.tomap()).then((value) {
+        updateUserProfile(model);
+      });
     } catch (e) {
-      print(e.toString());
+      print("User update error: $e");
     }
   }
 }

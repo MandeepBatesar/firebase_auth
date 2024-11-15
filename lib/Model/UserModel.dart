@@ -1,12 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Usermodel {
-  String? id, name, email, phonenumber, image, address;
+  String? id, name, email, image, address;
+  int? phonenumber;
   Usermodel(
       {this.id = "",
       this.name = "",
       this.email = "",
-      this.phonenumber = "",
+      this.phonenumber ,
       this.image = "",
       this.address});
 
@@ -15,7 +16,7 @@ class Usermodel {
       {String? id,
       String? name,
       String? email,
-      String? phonenumber,
+      int? phonenumber,
       String? image,
       String? address}) {
     return Usermodel(
@@ -44,14 +45,10 @@ class Usermodel {
       : id = json["id"] ?? "",
         name = json["name"] ?? "",
         email = json["email"] ?? "",
-        phonenumber = json["phonenumber"] ?? "",
+        phonenumber = json["phonenumber"] ?? 0,
         image = json["image"] ?? "",
         address = json["address"] ?? "";
-
-
-  }
-
-
+}
 
 class FirebaseResponseModel {
   Map<String, dynamic> data;
