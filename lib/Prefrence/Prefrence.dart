@@ -13,6 +13,7 @@ class Prefs {
 
   // static get _languageKey => "Language";
   get userkey => "userkey";
+  get userIdKey => "id";
   // setLanguage({required LanguageModel data}) {
   //   _prefs.setString(_languageKey, data.tojson());
   // }
@@ -25,8 +26,18 @@ class Prefs {
     return await _prefs.setString(userkey, jsonEncode(model.tomap()));
   }
 
+  // Save user ID to SharedPreferences
+  setUserId(String id) async {
+    return await _prefs.setString(userIdKey, id);
+  }
+
+  // Retrieve user ID from SharedPreferences
+  String? getUserId() {
+    return _prefs.getString(userIdKey);
+  }
+
   Usermodel getUserPrefs() {
-    return Usermodel.fromjson(jsonDecode(_prefs.getString(userkey).toString()));
+    return Usermodel.fromJson(jsonDecode(_prefs.getString(userkey).toString()));
   }
 
   removePrefs(String userkey) async {

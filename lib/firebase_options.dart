@@ -55,6 +55,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '26093214497',
     projectId: 'fir-auth-2df4c',
     storageBucket: 'fir-auth-2df4c.appspot.com',
+    databaseURL:
+        'https://fir-auth-2df4c-default-rtdb.asia-southeast1.firebasedatabase.app', // Updated databaseURL
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
@@ -64,5 +66,7 @@ class DefaultFirebaseOptions {
     projectId: 'fir-auth-2df4c',
     storageBucket: 'fir-auth-2df4c.appspot.com',
     iosBundleId: 'com.example.firebaseAuth',
+    databaseURL:
+        'https://fir-auth-2df4c-default-rtdb.asia-southeast1.firebasedatabase.app', // Updated databaseURL
   );
 }

@@ -31,7 +31,7 @@ class UserController extends GetxController {
     try {
       final snapshot = await Apis().getusercolllection.get();
       _userList = snapshot.docs.map((doc) {
-        return Usermodel.fromjson(doc.data());
+        return Usermodel.fromJson(doc.data());
       }).toList();
       update();
     } catch (e) {
@@ -50,7 +50,7 @@ class UserController extends GetxController {
 
   /// ***************************** Sign up
   Future<void> signup(Map<String, dynamic> data) async {
-    final Usermodel userdata = Usermodel.fromjson(data["userdata"]);
+    final Usermodel userdata = Usermodel.fromJson(data["userdata"]);
     try {
       final credential = await _services.auth(AuthState.SIGNUP,
               json: {"email": userdata.email, "password": data["password"]})
@@ -61,7 +61,8 @@ class UserController extends GetxController {
         await _services.post(
             Apis().userdoc(userid), userdata.copyWith(id: userid).tomap());
         _userdata = userdata.copyWith(id: userid);
-        prefrance.setUserPrefs(userdata); 
+        prefrance.setUserPrefs(userdata);
+        prefrance.setUserId(userid);
         Get.offAll(BottomnavigationbarScreen());
       }
     } catch (e) {
@@ -83,9 +84,10 @@ class UserController extends GetxController {
             json: {"email": email, "password": password}) as UserCredential;
 
         final Usermodel usermodelData =
-            Usermodel.fromjson(snapshot.docs.first.data());
+            Usermodel.fromJson(snapshot.docs.first.data());
         _userdata = usermodelData;
         prefrance.setUserPrefs(usermodelData);
+        prefrance.setUserId(usermodelData.id);
         Get.offAll(BottomnavigationbarScreen());
       }
     } catch (e) {
@@ -98,6 +100,7 @@ class UserController extends GetxController {
     try {
       await _services.auth(AuthState.LOGOUT);
       prefrance.removePrefs(prefrance.userkey);
+      prefrance.removePrefs(prefrance.userIdKey);
       Get.offAll(const LoginScreen());
       print("Logged out successfully");
     } catch (e) {
@@ -112,9 +115,10 @@ class UserController extends GetxController {
       if (userId.isNotEmpty) {
         final data = await Apis().userdoc(jsonDecode(userId)["id"]).get();
         if (data.exists) {
-          final Usermodel usermodelData = Usermodel.fromjson(data.data()!);
+          final Usermodel usermodelData = Usermodel.fromJson(data.data()!);
           _userdata = usermodelData;
           prefrance.setUserPrefs(usermodelData);
+          prefrance.setUserId(usermodelData.id);
           Get.offAll(BottomnavigationbarScreen());
         } else {
           Get.offAll(const LoginScreen());

@@ -49,6 +49,8 @@ dependencies:
   google_fonts: ^6.2.1
   firebase_database: ^10.5.7
   flutter_svg: ^2.0.14
+  intl: ^0.20.0
+  emoji_picker_flutter: ^2.2.0
 
 
 dev_dependencies:

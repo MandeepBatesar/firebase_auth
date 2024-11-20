@@ -1,4 +1,5 @@
 import 'package:firebase_authntication/Controller/UserController.dart';
+import 'package:firebase_authntication/view/Page/ChatDetailScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -10,7 +11,7 @@ class ChatView extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
           child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0),
         child: Column(
           children: [
             /************* */
@@ -23,9 +24,12 @@ class ChatView extends StatelessWidget {
                   }
                   return ListView.builder(
                     itemCount: userController.getuserList.length,
-                    itemBuilder: (context, index) {
-                      final user = userController.getuserList[index];
+                    itemBuilder: (context, i) {
+                      final user = userController.getuserList[i];
                       return ListTile(
+                        onTap: () {
+                          Get.to(ChatDetailScreen(model: user));
+                        },
                         contentPadding: EdgeInsets.zero,
                         leading: user.image!.isEmpty
                             ? ClipRRect(

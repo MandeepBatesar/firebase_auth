@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 class MsgModel {
   String? sender;
   String? txt;
@@ -14,7 +15,7 @@ class MsgModel {
       : sender = json["sender"] ?? "",
         txt = json["txt"] ?? "",
         seen = json["seen"] ?? false,
-        createdon = json["createdon"].toDate();
+        createdon = json["createdon"] ?? DateTime.now();
 
   Map<String, dynamic> toMap() {
     return {
@@ -37,5 +38,10 @@ class MsgModel {
       seen: seen ?? this.seen,
       createdon: createdon ?? this.createdon,
     );
+  }
+
+  @override
+  String toString() {
+    return 'MsgModel(sender: $sender, txt: $txt, seen: $seen, createdon: $createdon)';
   }
 }
